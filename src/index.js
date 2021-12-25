@@ -52,24 +52,32 @@ class Game extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      squares: Array(9).fill(null),
+      history: [
+        { squares: Array(9).fill(null) },
+      ],
       xIsNext: 1,
     };
     this.playerCharas = [ 'O', 'X' ];
   }
 
   handleClick(i) {
-    const squares = this.state.squares.slice();
+    const history = this.state.history;
+    const current = history[history.length - 1];
+    const squares = current.squares.slice();
     if (calculateWinner(squares) || squares[i]) { return; }
     squares[i] = this.playerCharas[this.state.xIsNext];
     this.setState({
-      squares: squares,
+      history: history.concat([{
+        squares: squares,
+      }]),
       xIsNext: this.state.xIsNext === 1 ? 0 : 1,
     });
   }
 
   render() {
-    const winner = calculateWinner(this.state.squares);
+    const history = this.state.history;
+    const current = history[history.length - 1];
+    const winner = calculateWinner(current.squares);
     const status = (winner) ?
       `Winner: ${winner}` :
       `Next player: ${this.playerCharas[this.state.xIsNext]}`;
@@ -78,7 +86,7 @@ class Game extends React.Component {
       <div className="game">
         <div className="game-board">
           <Board
-            squares={this.state.squares}
+            squares={current.squares}
             onClick={(i) => this.handleClick(i)}
           />
         </div>
